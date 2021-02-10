@@ -1,0 +1,345 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-3">
+      <label for="group">Вчитель:</label>
+      <select
+        [(ngModel)]="selectedTeacher.id"
+        (change)="selectTeacher($event.target)"
+        class="form-control"
+        name="teacher"
+        id="teacher"
+      >
+        <option value="null" [attr.disabled]="selectedTeacher.id">
+          Оберіть вчителя
+        </option>
+        <option *ngFor="let teacher of teachers" [attr.value]="teacher.id">
+          {{ teacher.firstName }} {{ teacher.middleName }}
+          {{ teacher.lastName }}
+        </option>
+      </select>
+    </div>
+</div>
+
+<div *ngIf="schedule" class="schedule-container">
+  <div *ngFor="let table of schedule" class="schedule">
+    <div class="row">
+      <div class="coll text-center"></div>
+    </div>
+    <div class="row">
+      <div class="col text-center" *ngIf="table[0].lessons[0]">
+        <span *ngIf="table[0].lessons[0].pairOfWeek">Парна неділя</span>
+        <span *ngIf="!table[0].lessons[0].pairOfWeek">Непарна неділя</span>
+      </div>
+    </div>
+    <div class="row schedule-row" *ngFor="let cell of table">
+      <div class="col-md-2 schedule-day" *ngIf="cell.lessons.length">
+        {{ cell.day }}
+      </div>
+      <div class="col-md-10 schedule-lesson">
+        <div class="row" *ngFor="let lesson of cell.lessons">
+          <div class="col lesson-cell">
+            {{ lesson.timeTable.startTime }} - {{ lesson.timeTable.endTime }}
+          </div>
+          <div class="col lesson-cell">{{ lesson.subject.name }}</div>
+          <div class="col lesson-cell">{{ lesson.activity.name }}</div>
+          <div class="col lesson-cell">{{ lesson.group.name }}</div>
+          <div class="col lesson-cell">{{ lesson.audience.name }}</div>
+          <div class="col lesson-action">
+            <div
+              class="btn-group-vertical"
+              role="group"
+              aria-label="Basic example"
+            >
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                (click)="editSchedule(lesson)"
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                class="btn btn-danger btn-sm"
+                (click)="deleteSchedule(lesson)"
+              >
+                Delete
+              </button>
+              <button
+                type="button"
+                class="btn btn-success btn-sm"
+                (click)="addSchedule(lesson)"
+              >
+                Add
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <modal
+    #facultySheduleModal
+    (saveModal)="saveCurriculum()"
+    [scheduleForm]="scheduleForm"
+  >
+    <div class="alert alert-danger" role="alert" *ngIf="windowLesson.length">
+      Зверніть увагу що між парами є вікна:
+      <ul>
+        <li *ngFor="let window of windowLesson">
+          {{ window.startTime }} - {{ window.endTime }}
+        </li>
+      </ul>
+    </div>
+
+    <form *ngIf="selectedCurriculum" [formGroup]="scheduleForm">
+      <h5>Група</h5>
+
+      <div class="form-group">
+        <label for="day">День:</label>
+        <select
+          [ngClass]="{
+            'is-invalid':
+              scheduleForm.controls.day.invalid &&
+              scheduleForm.controls.day.touched
+          }"
+          class="form-control"
+          [(ngModel)]="selectedCurriculum.day.id"
+          (change)="changeForm($event.target)"
+          formControlName="day"
+          name="day"
+          id="day"
+        >
+          <option value="null" [attr.disabled]="selectedCurriculum.day.id">
+            Оберіть день
+          </option>
+          <option *ngFor="let day of days" [attr.value]="day.id">
+            {{ day.name }}
+          </option>
+        </select>
+        <div class="invalid-feedback">
+          Oберіть будьласка значення для поля День
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="timeTable" class="form-label">Час:</label>
+        <select
+          class="form-control"
+          [ngClass]="{
+            'is-invalid':
+              scheduleForm.controls.timeTable.invalid &&
+              scheduleForm.controls.timeTable.touched
+          }"
+          [(ngModel)]="selectedCurriculum.timeTable.id"
+          (change)="changeForm($event.target)"
+          formControlName="timeTable"
+          name="timeTable"
+          id="timeTable"
+        >
+          <option
+            value="null"
+            [attr.disabled]="selectedCurriculum.timeTable.id"
+          >
+            Оберіть час
+          </option>
+          <option *ngFor="let time of times" [attr.value]="time.id">
+            {{ time.startTime }} - {{ time.endTime }}
+          </option>
+        </select>
+        <div class="invalid-feedback">
+          Oберіть будьласка значення для поля Час
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="subject" class="form-label">Прeдмет:</label>
+        <select
+          class="form-control"
+          [ngClass]="{
+            'is-invalid':
+              scheduleForm.controls.subject.invalid &&
+              scheduleForm.controls.subject.touched
+          }"
+          [(ngModel)]="selectedCurriculum.subject.id"
+          (change)="changeForm($event.target)"
+          formControlName="subject"
+          name="subject"
+          id="subject"
+        >
+          <option value="null" [attr.disabled]="selectedCurriculum.subject.id">
+            Оберіть предмет
+          </option>
+          <option *ngFor="let subject of subjects" [attr.value]="subject.id">
+            {{ subject.name }}
+          </option>
+        </select>
+        <div class="invalid-feedback">
+          Oберіть будьласка значення для поля Предмет
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="activity" class="form-label">Вид заняття:</label>
+        <select
+          class="form-control"
+          [ngClass]="{
+            'is-invalid':
+              scheduleForm.controls.activity.invalid &&
+              scheduleForm.controls.activity.touched
+          }"
+          [(ngModel)]="selectedCurriculum.activity.id"
+          id="activity"
+          name="activity"
+          (change)="changeForm($event.target)"
+          formControlName="activity"
+        >
+          <option value="null" [attr.disabled]="selectedCurriculum.activity.id">
+            Оберіть вид занять
+          </option>
+          <option
+            *ngFor="let activity of activities"
+            [attr.value]="activity.id"
+          >
+            {{ activity.name }}
+          </option>
+        </select>
+        <div class="invalid-feedback">
+          Oберіть будьласка значення для поля Вид занятть
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="group" class="form-label">Група:</label>
+        <select
+          [ngClass]="{
+            'is-invalid':
+              scheduleForm.controls.group.invalid &&
+              scheduleForm.controls.group.touched
+          }"
+          [(ngModel)]="selectedCurriculum.group.id"
+          (change)="changeForm($event.target)"
+          formControlName="group"
+          class="form-control"
+          name="group"
+          id="group"
+        >
+          <option value="null" [attr.disabled]="selectedCurriculum.group.id">
+            Оберіть групу
+          </option>
+          <option *ngFor="let group of groups" [attr.value]="group.id">
+            {{ group.name }}
+          </option>
+        </select>
+        <div class="invalid-feedback">
+          Oберіть будьласка значення для поля Група
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="audience" class="form-label">Аудиторія:</label>
+        <select
+          [ngClass]="{
+            'is-invalid':
+              scheduleForm.controls.audience.invalid &&
+              scheduleForm.controls.audience.touched
+          }"
+          [(ngModel)]="selectedCurriculum.audience.id"
+          (change)="changeForm($event.target)"
+          formControlName="audience"
+          class="form-control"
+          name="audience"
+          id="audience"
+        >
+          <option value="null" [attr.disabled]="selectedCurriculum.audience.id">
+            Оберіть аудиторію
+          </option>
+          <option *ngFor="let audience of audiences" [attr.value]="audience.id">
+            {{ audience.name }}
+          </option>
+        </select>
+        <div class="invalid-feedback">
+          Oберіть будьласка значення для поля Аудиторія
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="capacity" class="form-label">Повнота групи:</label>
+        <select
+          [ngClass]="{
+            'is-invalid':
+              scheduleForm.controls.capacity.invalid &&
+              scheduleForm.controls.capacity.touched
+          }"
+          [(ngModel)]="selectedCurriculum.capacity"
+          (change)="changeForm($event.target)"
+          formControlName="capacity"
+          class="form-control"
+          name="capacity"
+          id="capacity"
+        >
+          <option value="null" [attr.disabled]="selectedCurriculum.capacity">
+            Оберіть повноту групи
+          </option>
+          <option value="0">Пів групи</option>
+          <option value="1">Група</option>
+        </select>
+        <div class="invalid-feedback">
+          Oберіть будьласка значення для поля Повнотa групи
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="pairOfWeek" class="form-label">Неділя:</label>
+        <select
+          [ngClass]="{
+            'is-invalid':
+              scheduleForm.controls.pairOfWeek.invalid &&
+              scheduleForm.controls.pairOfWeek.touched
+          }"
+          [(ngModel)]="selectedCurriculum.pairOfWeek"
+          (change)="changeForm($event.target)"
+          formControlName="pairOfWeek"
+          class="form-control"
+          name="pairOfWeek"
+          id="pairOfWeek"
+        >
+          <option value="null" [attr.disabled]="selectedCurriculum.pairOfWeek">
+            Оберіть неділю
+          </option>
+          <option value="0">Парна неділя</option>
+          <option value="1">Непарна неділя</option>
+        </select>
+        <div class="invalid-feedback">
+          Oберіть будьласка значення для поля Неділя
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="duration" class="form-label">Тривалість:</label>
+        <select
+          [ngClass]="{
+            'is-invalid':
+              scheduleForm.controls.duration.invalid &&
+              scheduleForm.controls.duration.touched
+          }"
+          [(ngModel)]="selectedCurriculum.duration"
+          (change)="changeForm($event.target)"
+          formControlName="duration"
+          class="form-control"
+          name="duration"
+          id="duration"
+        >
+          <option value="null" [attr.disabled]="selectedCurriculum.duration">
+            Оберіть тривалість
+          </option>
+          <option value="0">Семестр</option>
+          <option value="1">Модуль</option>
+        </select>
+        <div class="invalid-feedback">
+          Oберіть будьласка значення для поля Тивалість
+        </div>
+      </div>
+    </form>
+  </modal>
+</div>

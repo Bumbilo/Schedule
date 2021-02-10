@@ -1,0 +1,86 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Provide sufficient contrast against white background */
+a {
+  color: #0366d6;
+}
+
+code {
+  color: #e01a76;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.schedule {
+  margin: 50px;
+  min-width: 1200px;
+}
+
+.schedule-day {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #eee;
+}
+
+.schedule-container {
+  display: flex;
+}
+
+.schedule-group {
+  display: flex;
+  border-right: 2px dashed #eee;
+}
+
+.col {
+  border: 1px solid #eee;
+}
+
+.lesson-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-width: 120px;
+  padding: 5px;
+
+}
+
+.lesson-action {
+  max-width: 0px;
+  padding: 0;
+  width: 0;
+  background-color: #fff;
+  border: none;
+}
+
+.lesson-action button {
+  border: none;
+  visibility: hidden;
+}
+
+.schedule-lesson .row:hover .lesson-action button{
+  visibility: visible; 
+}
+
+.schedule-lesson .row:hover {
+  background-color: #cfe2ff;
+  cursor: pointer;
+}
+
+.schedule-row:nth-of-type(odd) {
+  background-color: rgba(0,0,0,.03);
+}
+
+.group-name {
+  text-align: center;
+  width: 100%;
+}
+
+.form-control.is-invalid {
+  background-position: right calc(.375em + 1.1875rem) center;
+}

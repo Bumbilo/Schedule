@@ -1,0 +1,29 @@
+version: "2"
+
+services:
+  mssql:
+    networks:
+      - dotnet
+    container_name: mssql
+    image: bumbilo/schedule-db:v1
+    volumes:
+      - mssql-volume:/var/opt/mssql
+    environment:
+      - ACCEPT_EULA=SA
+      - SA_PASSWORD=Test@123s
+    ports:
+      - "1433:1433"
+  dotnet:
+    depends_on:
+      - mssql
+    networks:
+      - dotnet
+    container_name: dotnet
+    image: bumbilo/schedule-net:v1
+    ports:
+      - "5000:80"
+
+networks:
+  dotnet:
+volumes:
+  mssql-volume:

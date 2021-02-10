@@ -1,0 +1,14 @@
+<div class="modal fade" id="js-schedule__modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"> 
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        <ng-content></ng-content>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeWindow()">Close</button>
+        <button type="button" class="btn btn-primary" (click)="saveData()" [disabled]="scheduleForm.invalid" >Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
